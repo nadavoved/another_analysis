@@ -4,4 +4,5 @@ env
 data/*
 !data
 driver/*
+!driver
 
