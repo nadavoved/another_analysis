@@ -1,8 +1,5 @@
 venv
 env
 .idea
-data/*
-!data
-driver/*
-!driver
+
 
