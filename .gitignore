@@ -2,5 +2,4 @@ venv
 env
 .idea
 data/*
-driver/downloads/*
 driver/msedgedriver.exe
