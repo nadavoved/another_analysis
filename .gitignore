@@ -3,5 +3,5 @@ env
 .idea
 data/*
 !data
-driver/msedgedriver.exe
+driver/*
 
