@@ -2,4 +2,6 @@ venv
 env
 .idea
 data/*
+!data
 driver/msedgedriver.exe
+
