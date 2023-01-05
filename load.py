@@ -2,7 +2,9 @@ import pandas as pd
 from pandas import Int16Dtype
 from inspect import stack
 
-"""Module to allow only one csv DataFrame to exist at once and optimize its memory requirement."""
+"""Module to allow only one csv DataFrame to exist at 
+once and optimize its memory requirement.
+"""
 
 TYPE_MAP = {'Year': Int16Dtype(),
             'Month': Int16Dtype(),
@@ -19,25 +21,13 @@ TYPE_MAP = {'Year': Int16Dtype(),
             'Distance': Int16Dtype()}
 
 
-class Singleton:
-    """Base class for allowing only one instance of a subclass to exist.
-     This is done by deleting previous instances.
-     """
-
-    def __new__(cls, *args, **kwargs):
-        g = stack()[1][0].f_globals
-        all_variables = [item for item in g]
-        for var in all_variables:
-            if isinstance(g[var], cls):
-                del g[var]
-        return super().__new__(cls)
-
-
-class SingleDf(Singleton):
-    """Wrapper class for dataframes returned by the `get_years` function bellow."""
-
-    def __init__(self, first_year: int, last_year: int = None):
-        self.__dict__ = get_years(first_year, last_year).__dict__
+def wipe_frames():
+    """Delete all DataFrames"""
+    g = stack()[2][0].f_globals
+    all_variables = [item for item in g]
+    for var in all_variables:
+        if isinstance(g[var], pd.DataFrame):
+            del g[var]
 
 
 def get_years(first_year: int, last_year: int = None) -> pd.DataFrame:
@@ -48,6 +38,7 @@ def get_years(first_year: int, last_year: int = None) -> pd.DataFrame:
     :param first_year: (int) the first year to load data from.
     :param last_year: (int) the last year to load data from.
     """
+    wipe_frames()
 
     def read_year(yr):
         return pd.read_csv(f'data/{yr}.csv', encoding='cp1252',
@@ -68,4 +59,6 @@ def get_years(first_year: int, last_year: int = None) -> pd.DataFrame:
         year_slice = [read_year(yr) for yr in
                       range(first_year, last_year + 1)]
         return pd.concat(objs=year_slice, ignore_index=True)
+
+
 
