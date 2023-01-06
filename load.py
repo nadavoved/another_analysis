@@ -1,5 +1,5 @@
 import pandas as pd
-from pandas import Int16Dtype
+from pandas import Int16Dtype, BooleanDtype
 from inspect import stack
 
 """Module to allow only one csv DataFrame to exist at 
@@ -10,15 +10,18 @@ TYPE_MAP = {'Year': Int16Dtype(),
             'Month': Int16Dtype(),
             'DayofMonth': Int16Dtype(),
             'DayOfWeek': Int16Dtype(),
-            'Cancelled': Int16Dtype(),
-            'Diverted': Int16Dtype(),
-            'UniqueCarrier': 'category',
-            'Origin': 'category',
-            'Dest': 'category',
-            'FlightNum': Int16Dtype(),
+            'Cancelled': BooleanDtype(),
+            'Diverted': BooleanDtype(),
+            'UniqueCarrier': 'object',
+            'Origin': 'object',
+            'Dest': 'object',
+            'FlightNum': 'string',
             'ActualElapsedTime': Int16Dtype(),
             'AirTime': Int16Dtype(),
             'Distance': Int16Dtype()}
+
+FINAL_TYPES = {item: 'category' for item in ['Year', 'Month', 'DayofMonth',
+                                             'DayOfWeek', 'UniqueCarrier', 'Origin', 'Dest']}
 
 
 def wipe_frames():
@@ -30,35 +33,33 @@ def wipe_frames():
             del g[var]
 
 
-def get_years(first_year: int, last_year: int = None) -> pd.DataFrame:
+def get_years(*args, first_year: int = None, last_year: int = None, wipe=True) -> pd.DataFrame:
     """Read specific years from the relevant csv's.
     Using only required columns and optimal dtypes.
     Allow a maximum of 5 years.
     #NOTE - even then its execution time is relatively long.
     :param first_year: (int) the first year to load data from.
     :param last_year: (int) the last year to load data from.
+    :param wipe: (bool) to wipe previous frames or not.
     """
-    wipe_frames()
+    if wipe:
+        wipe_frames()
 
     def read_year(yr):
         return pd.read_csv(f'data/{yr}.csv', encoding='cp1252',
                            usecols=TYPE_MAP.keys(), dtype=TYPE_MAP)
 
-    def verify_yr(y):
-        return y in range(1987, 2009)
+    def verify_rng(x: range | tuple):
+        if len(list(x)) > 5:
+            raise OverflowError('should not include more than 5 years.')
+        if any(y not in range(1987, 2009) for y in x):
+            raise ValueError('input not in range.')
+        return x
 
-    if not verify_yr(first_year):
-        raise ValueError('first year not in range.')
-    if last_year is None:
-        return read_year(first_year)
+    if args:
+        rng = verify_rng(args)
     else:
-        if not verify_yr(last_year):
-            raise ValueError('last year not in range.')
-        if not 0 < last_year - first_year < 5:
-            raise ValueError('Years gap should positive and less than 5.')
-        year_slice = [read_year(yr) for yr in
-                      range(first_year, last_year + 1)]
-        return pd.concat(objs=year_slice, ignore_index=True)
-
-
-
+        rng = verify_rng(range(first_year, last_year + 1))
+    year_slice = [read_year(yr) for yr in rng]
+    frame = pd.concat(objs=year_slice, ignore_index=True)
+    return frame.astype(dtype=FINAL_TYPES).rename({'DayofMonth': 'DayOfMonth'})
