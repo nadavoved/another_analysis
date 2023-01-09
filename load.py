@@ -92,4 +92,4 @@ def get_years(*args: int, year_range: tuple[int, int] = None, sample_size=1000) 
 
 
 if __name__ == '__main__':
-    print(get_years(1999).info())
+    data_to_feather()
