@@ -3,10 +3,8 @@ from inspect import stack
 
 import pandas as pd
 
-
-
-"""Module to allow only one csv DataFrame to exist at 
-once and optimize its memory requirement.
+"""Module to load csv's to feather files, 
+then read feathers as required.
 """
 
 TYPE_MAP = {'Year': 'category',
@@ -59,7 +57,8 @@ def get_years(*args: int, year_range: tuple[int, int] = None, sample_size=1000) 
     #NOTE - even then its execution time is relatively long.
     :param args: (int) individual years to load data from.
     :param year_range: tuple[int, int] the first and last years to load data from.
-    :param sample_size: (int) sample size to draw from each year.
+    :param sample_size: (int) sample size to draw from each year,
+    then from all years combined.
     """
 
     def read_year(yr):
@@ -85,10 +84,12 @@ def get_years(*args: int, year_range: tuple[int, int] = None, sample_size=1000) 
         case _:
             raise ValueError('Can\'t accept both individual years and range')
     year_slice = [read_year(yr) for yr in rng]
-    frame = pd.concat(objs=year_slice, ignore_index=True).sample(sample_size)
-    return frame.astype(dtype=FINAL_TYPES).reindex(columns=COLS).\
+    frame = pd.concat(objs=year_slice, ignore_index=True)
+    frame = frame.astype(dtype=FINAL_TYPES).reindex(columns=COLS). \
         rename(columns={'DayofMonth': 'DayOfMonth'})
+    frame['route'] = (frame['Origin'].astype('str') + '->' + frame['Dest'].astype('str')).astype('category')
+    return frame
+
 
 if __name__ == '__main__':
-    data_to_feather()
-
+    print(get_years(1999).info())
