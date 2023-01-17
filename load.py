@@ -7,10 +7,10 @@ import pandas as pd
 then read feathers as required.
 """
 
-TYPE_MAP = {'Year': 'category',
-            'Month': 'category',
-            'DayofMonth': 'category',
-            'DayOfWeek': 'category',
+TYPE_MAP = {'Year': 'int16',
+            'Month': 'int8',
+            'DayofMonth': 'int8',
+            'DayOfWeek': 'int8',
             'Cancelled': pd.BooleanDtype(),
             'ArrDelay': 'float32',
             'DepDelay': 'float32',
@@ -22,19 +22,17 @@ TYPE_MAP = {'Year': 'category',
             'AirTime': 'float32',
             'Distance': 'float32'}
 
-FINAL_TYPES = {item: 'category' for item in TYPE_MAP
-               if TYPE_MAP[item] == 'category'}
-COLS = ['UniqueCarrier'] + [label for label in TYPE_MAP.keys()
-                            if label != 'UniqueCarrier']
+TO_CAT = {item: 'category' for item in
+          ['DayOfWeek', 'UniqueCarrier', 'DayOfMonth',
+          'Year','Month', 'Dest', 'Origin']}
 
 
 def data_to_feather():
     def csv_to_feather(fp):
-        temp = pd.read_csv(fp, encoding='cp1252',
-                           usecols=COLS, dtype=TYPE_MAP)
-        os.remove(fp)
+        temp = pd.read_csv(fp, encoding='cp1252', dtype=TYPE_MAP, usecols=TYPE_MAP.keys())
         new_path = f"{fp.rstrip('csv')}feather"
-        temp.to_feather(path=new_path)
+        temp.rename(columns={'DayofMonth': 'DayOfMonth'}). \
+            to_feather(path=new_path)
         print(f'converted {fp} to {new_path}.')
 
     for i in range(1987, 2009):
@@ -62,8 +60,7 @@ def get_years(*args: int, year_range: tuple[int, int] = None, sample_size=1000) 
     """
 
     def read_year(yr):
-        return pd.read_feather(f'data/{yr}.feather',
-                               columns=COLS).sample(sample_size)
+        return pd.read_feather(f'data/{yr}.feather').sample(sample_size)
 
     def verify_rng(x: range | tuple):
         if len(list(x)) > 10:
@@ -85,10 +82,10 @@ def get_years(*args: int, year_range: tuple[int, int] = None, sample_size=1000) 
             raise ValueError('Can\'t accept both individual years and range')
     year_slice = [read_year(yr) for yr in rng]
     frame = pd.concat(objs=year_slice, ignore_index=True)
-    frame = frame.astype(dtype=FINAL_TYPES).reindex(columns=COLS). \
-        rename(columns={'DayofMonth': 'DayOfMonth'})
-    frame['route'] = (frame['Origin'].astype('str') + '->' + frame['Dest'].astype('str')).astype('category')
-    return frame
+    ordered_frame = frame.astype(TO_CAT)
+    ordered_frame['route'] = (ordered_frame['Origin'].astype('str') + '->' +
+                              ordered_frame['Dest'].astype('str')).astype('category')
+    return ordered_frame
 
 
 if __name__ == '__main__':
