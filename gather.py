@@ -62,11 +62,10 @@ def extract_datasets(zip_folder: Path):
 
 def press_download(driver):
     url = ('https://dataverse.harvard.edu/'
-           'dataset.xhtml?persistentId=doi:10.7910/DVN/HG7NV7#')
+           'dataset.xhtml?persistentId=doi:10.7910/DVN/HG7NV7')
     driver.get(url)
-    download_menu_xpath = r'//*[@id="actionButtonBlock"]/' \
-                          r'div[1]/div/button'
-    download_button_id = "datasetForm:j_idt264"
+    download_menu_xpath = r'//*[@id="actionButtonBlock"]/div[1]/div/button'
+    download_button_id = "datasetForm:j_idt268"
     menu_button = driver.find_element(by=By.XPATH,
                                       value=download_menu_xpath)
     menu_button.click()
