@@ -1,5 +1,8 @@
 # Overview
 ___
+# Dataset - Data Expo 2009: Airline on time data (Udacity Given)
+> [Download Manually](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/HG7NV7)
+,or simply follow the setup bellow...
 ## Introduction
 > This is a flights analysis based 
 on a dataset containing various 
@@ -15,8 +18,11 @@ that are relevant to this direction. The entire dataset is very memory consuming
     - python3.11 -m venv venv
     - ./venv/Scripts/activate
     - pip install -r requirements.txt
-- To get the data, either run `gather.py` located in root folder, or add the data manually to the `data` folder. 
-- run `load.py` for loading time and memory optimizations. **REQUIRED**
+- To get the data, either run `gather.py` located in root folder, 
+or add the data manually to the `data` folder. <mark> NOTE - `gather.py` will download and extract the data automatically.</mark>
+
+- After getting the data, 
+run `load.py` for loading time and memory optimizations. **REQUIRED**
 ___
 ### About Optimization:
 **Initially, all yearly dataset consume a lot of memory:**
