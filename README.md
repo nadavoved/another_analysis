@@ -23,8 +23,8 @@ pip install -r requirements.txt
 - To get the data, either run `gather.py` located in root folder, 
 or add the data manually to the `data` folder. <mark> NOTE - `gather.py` will download and extract the data automatically.</mark>
 
-- After getting the data, 
-run `load.py` for loading time and memory optimizations. **REQUIRED**
+- ***REQUIRED:*** After getting the data, 
+run `load.py` for loading time and memory optimizations. 
 ___
 ### About Optimization:
 **Initially, all yearly dataset consume a lot of memory:**
