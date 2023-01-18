@@ -14,10 +14,12 @@ etc...), therefore I included features
 that are relevant to this direction. The entire dataset is very memory consuming, even when heavily optimized, so I had to use a sample in my analysis in order to create visualizations. The sample I used contains 9000 from years 2000-2008, 1000 records for each year.
 
 ## Setup
-    - cd <project root>
-    - python3.11 -m venv venv
-    - ./venv/Scripts/activate
-    - pip install -r requirements.txt
+```
+cd <project root>
+python3.11 -m venv venv
+./venv/Scripts/activate
+pip install -r requirements.txt
+```
 - To get the data, either run `gather.py` located in root folder, 
 or add the data manually to the `data` folder. <mark> NOTE - `gather.py` will download and extract the data automatically.</mark>
 
